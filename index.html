@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Live Shirt Color Voting</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg,#1e3c72,#2a5298);
+      color: white;
+      text-align: center;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: white;
+      color: black;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background: #1e3c72;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    table {
+      width: 100%;
+      margin-top: 20px;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 10px;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+
+    th {
+      background: #1e3c72;
+      color: white;
+    }
+
+    .winner {
+      margin-top: 20px;
+      font-size: 18px;
+      font-weight: bold;
+      color: #1e3c72;
+    }
+  </style>
+</head>
+<body>
+
+<h1>🏆 Live Shirt Color Voting</h1>
+
+<div class="container">
+
+  <input type="text" id="name" placeholder="Enter Your Name">
+
+  <select id="color">
+    <option value="">Select Color</option>
+    <option>Emerald Green</option>
+    <option>Maroon</option>
+    <option>Dusty Pink</option>
+    <option>Navy Blue</option>
+    <option>Sky Blue</option>
+    <option>Mustard Yellow</option>
+    <option>Lavender</option>
+    <option>Coral Red</option>
+    <option>Light Olive Green</option>
+    <option>Sage Green</option>
+    <option>Rust Orange</option>
+    <option>Slate Blue</option>
+  </select>
+
+  <button onclick="submitVote()">Submit Vote</button>
+
+  <h2>📋 Voters List</h2>
+  <table id="votersTable">
+    <tr><th>Name</th><th>Color</th></tr>
+  </table>
+
+  <h2>📊 Vote Results</h2>
+  <table id="resultsTable">
+    <tr><th>Color</th><th>Votes</th></tr>
+  </table>
+
+  <div class="winner" id="winner"></div>
+
+</div>
+
+<script>
+  const supabaseUrl = "https://frbuaafqvnshpcvbfkew.supabase.co";
+  const supabaseKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZyYnVhYWZxdm5zaHBjdmJma2V3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIwMzM4MDksImV4cCI6MjA4NzYwOTgwOX0.n5cGM6j-IqELinSUA5l5-x0wcUp_OyobIzWVc1ofUkU";
+
+  const { createClient } = supabase;
+  const client = createClient(supabaseUrl, supabaseKey);
+
+  async function submitVote() {
+    const name = document.getElementById("name").value.trim();
+    const color = document.getElementById("color").value;
+
+    if (!name || !color) {
+      alert("Please enter name and select color");
+      return;
+    }
+
+    await client.from("votes").insert([
+      { name: name, colour: color }
+    ]);
+
+    document.getElementById("name").value = "";
+    document.getElementById("color").value = "";
+
+    loadVotes();
+  }
+
+  async function loadVotes() {
+    const { data } = await client.from("votes").select("*");
+
+    const votersTable = document.getElementById("votersTable");
+    const resultsTable = document.getElementById("resultsTable");
+
+    votersTable.innerHTML = "<tr><th>Name</th><th>Color</th></tr>";
+    resultsTable.innerHTML = "<tr><th>Color</th><th>Votes</th></tr>";
+
+    const counts = {};
+
+    if (data) {
+      data.forEach(v => {
+        votersTable.innerHTML += `<tr><td>${v.name}</td><td>${v.colour}</td></tr>`;
+        counts[v.colour] = (counts[v.colour] || 0) + 1;
+      });
+
+      let maxVotes = 0;
+      let winnerColor = "";
+
+      for (const color in counts) {
+        resultsTable.innerHTML += `<tr><td>${color}</td><td>${counts[color]}</td></tr>`;
+        if (counts[color] > maxVotes) {
+          maxVotes = counts[color];
+          winnerColor = color;
+        }
+      }
+
+      document.getElementById("winner").innerHTML =
+        winnerColor ? "🥇 Leading Color: " + winnerColor + " (" + maxVotes + " votes)" : "";
+    }
+  }
+
+  loadVotes();
+</script>
+
+</body>
+</html>
