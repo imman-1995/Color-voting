@@ -1,0 +1,104 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Vote My Best Shirt Color 👕</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 500px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        h1 { text-align: center; }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0 20px 0;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+        .color-option { margin: 8px 0; }
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            background: #667eea;
+            color: white;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover { background: #5a67d8; }
+        .results { margin-top: 20px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Vote My Best Shirt Color 👕</h1>
+    <p>Enter your name and choose your favorite color:</p>
+
+    <input type="text" id="name" placeholder="Your Name">
+
+    <form id="voteForm">
+        <div class="color-option"><input type="radio" name="color" value="Emerald Green"> Emerald Green</div>
+        <div class="color-option"><input type="radio" name="color" value="Maroon"> Maroon</div>
+        <div class="color-option"><input type="radio" name="color" value="Dusty Pink"> Dusty Pink</div>
+        <div class="color-option"><input type="radio" name="color" value="Navy Blue"> Navy Blue</div>
+        <div class="color-option"><input type="radio" name="color" value="Sky Blue"> Sky Blue</div>
+        <div class="color-option"><input type="radio" name="color" value="Mustard Yellow"> Mustard Yellow</div>
+        <div class="color-option"><input type="radio" name="color" value="Lavender"> Lavender</div>
+        <div class="color-option"><input type="radio" name="color" value="Coral Red"> Coral Red</div>
+        <div class="color-option"><input type="radio" name="color" value="Light Olive Green"> Light Olive Green</div>
+        <div class="color-option"><input type="radio" name="color" value="Sage Green"> Sage Green</div>
+        <div class="color-option"><input type="radio" name="color" value="Rust Orange"> Rust Orange</div>
+        <div class="color-option"><input type="radio" name="color" value="Slate Blue"> Slate Blue</div>
+
+        <button type="button" onclick="submitVote()">Submit Vote</button>
+    </form>
+
+    <div class="results" id="results"></div>
+</div>
+
+<script>
+    let votes = [];
+
+    function submitVote() {
+        const name = document.getElementById("name").value;
+        const color = document.querySelector('input[name="color"]:checked');
+
+        if (!name || !color) {
+            alert("Please enter your name and select a color.");
+            return;
+        }
+
+        votes.push({name: name, color: color.value});
+        displayResults();
+
+        document.getElementById("voteForm").reset();
+        document.getElementById("name").value = "";
+    }
+
+    function displayResults() {
+        let output = "<h3>Current Votes (Session Only):</h3><ul>";
+        votes.forEach(v => {
+            output += "<li>" + v.name + " voted for <b>" + v.color + "</b></li>";
+        });
+        output += "</ul>";
+        document.getElementById("results").innerHTML = output;
+    }
+</script>
+
+</body>
+</html>
