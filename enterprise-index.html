@@ -1,0 +1,199 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Enterprise Shirt Color Voting</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: #333;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 40px auto;
+      background: #ffffff;
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+    }
+
+    h1 {
+      text-align: center;
+      color: #1e3c72;
+      margin-bottom: 30px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: none;
+      background: #1e3c72;
+      color: white;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: #2a5298;
+    }
+
+    table {
+      width: 100%;
+      margin-top: 20px;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 12px;
+      border: 1px solid #ddd;
+      text-align: center;
+    }
+
+    th {
+      background: #1e3c72;
+      color: white;
+    }
+
+    .winner {
+      margin-top: 20px;
+      font-weight: bold;
+      font-size: 18px;
+      color: #1e3c72;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>🏆 Enterprise Shirt Color Voting</h1>
+
+  <div class="form-group">
+    <input type="text" id="name" placeholder="Enter Your Name">
+  </div>
+
+  <div class="form-group">
+    <select id="color">
+      <option value="">Select Color</option>
+      <option>Emerald Green</option>
+      <option>Maroon</option>
+      <option>Dusty Pink</option>
+      <option>Navy Blue</option>
+      <option>Sky Blue</option>
+      <option>Mustard Yellow</option>
+      <option>Lavender</option>
+      <option>Coral Red</option>
+      <option>Light Olive Green</option>
+      <option>Sage Green</option>
+      <option>Rust Orange</option>
+      <option>Slate Blue</option>
+    </select>
+  </div>
+
+  <button onclick="submitVote()">Submit Vote</button>
+
+  <h2>📋 Voters List</h2>
+  <table id="votersTable">
+    <tr><th>Name</th><th>Color</th></tr>
+  </table>
+
+  <h2>📊 Vote Results</h2>
+  <table id="resultsTable">
+    <tr><th>Color</th><th>Votes</th></tr>
+  </table>
+
+  <div class="winner" id="winner"></div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBGelgmJ_0yFpsCcGZBSkkXyfGDzUz3aAI",
+    authDomain: "dress-colour-voting.firebaseapp.com",
+    projectId: "dress-colour-voting",
+    storageBucket: "dress-colour-voting.firebasestorage.app",
+    messagingSenderId: "776438626194",
+    appId: "1:776438626194:web:218d9cf7a5ef48d4c4734b"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  const votersTable = document.getElementById("votersTable");
+  const resultsTable = document.getElementById("resultsTable");
+  const winnerDiv = document.getElementById("winner");
+
+  window.submitVote = async function () {
+    const name = document.getElementById("name").value.trim();
+    const color = document.getElementById("color").value;
+
+    if (!name || !color) {
+      alert("Please enter name and select color.");
+      return;
+    }
+
+    await addDoc(collection(db, "votes"), {
+      name: name,
+      color: color,
+      timestamp: new Date()
+    });
+
+    document.getElementById("name").value = "";
+    document.getElementById("color").value = "";
+  };
+
+  onSnapshot(collection(db, "votes"), (snapshot) => {
+    votersTable.innerHTML = "<tr><th>Name</th><th>Color</th></tr>";
+    resultsTable.innerHTML = "<tr><th>Color</th><th>Votes</th></tr>";
+
+    const counts = {};
+
+    snapshot.forEach(doc => {
+      const data = doc.data();
+
+      votersTable.innerHTML += `<tr><td>${data.name}</td><td>${data.color}</td></tr>`;
+
+      counts[data.color] = (counts[data.color] || 0) + 1;
+    });
+
+    let maxVotes = 0;
+    let winningColor = "";
+
+    for (const color in counts) {
+      resultsTable.innerHTML += `<tr><td>${color}</td><td>${counts[color]}</td></tr>`;
+
+      if (counts[color] > maxVotes) {
+        maxVotes = counts[color];
+        winningColor = color;
+      }
+    }
+
+    if (winningColor) {
+      winnerDiv.innerHTML = "🥇 Current Leading Color: " + winningColor + " (" + maxVotes + " votes)";
+    }
+  });
+</script>
+
+</body>
+</html>
