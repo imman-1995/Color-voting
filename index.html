@@ -1,0 +1,176 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ramzan Dress Code - 50 Colour Voting</title>
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    margin:0;
+    padding:20px;
+    background:#f4f6f9;
+    text-align:center;
+}
+
+h1{
+    color:#1f3c88;
+}
+
+.container{
+    max-width:1200px;
+    margin:auto;
+}
+
+.color-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(120px,1fr));
+    gap:10px;
+    margin:20px 0;
+}
+
+.color-box{
+    padding:20px;
+    border-radius:10px;
+    color:#fff;
+    font-weight:bold;
+}
+
+input{
+    padding:10px;
+    margin:10px;
+    width:250px;
+    font-size:16px;
+}
+
+button{
+    padding:10px 25px;
+    font-size:16px;
+    background:#1f3c88;
+    color:white;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+table{
+    width:100%;
+    margin-top:20px;
+    border-collapse:collapse;
+}
+
+th,td{
+    border:1px solid #ccc;
+    padding:8px;
+}
+
+th{
+    background:#1f3c88;
+    color:white;
+}
+
+.leader{
+    margin-top:20px;
+    font-size:18px;
+    font-weight:bold;
+    color:green;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🌙 Ramzan Dress Code</h1>
+<p>Select a colour number and vote</p>
+
+<div class="container">
+
+<div class="color-grid" id="colors"></div>
+
+<input type="text" id="name" placeholder="Enter your name">
+<input type="number" id="colorNumber" placeholder="Enter colour number (1-50)" min="1" max="50">
+<br>
+<button onclick="submitVote()">Submit Vote</button>
+
+<h2>Voters List</h2>
+<table>
+<thead>
+<tr><th>Name</th><th>Colour Number</th></tr>
+</thead>
+<tbody id="voterTable"></tbody>
+</table>
+
+<div class="leader" id="leader"></div>
+
+</div>
+
+<script>
+
+const colorsContainer = document.getElementById("colors");
+const votes = {};
+const voterData = [];
+
+for(let i=1;i<=50;i++){
+    const hue = Math.floor((i*360)/50);
+    const color = "hsl(" + hue + ", 70%, 50%)";
+
+    const div = document.createElement("div");
+    div.className="color-box";
+    div.style.background=color;
+    div.innerText="Colour " + i;
+    colorsContainer.appendChild(div);
+
+    votes[i]=0;
+}
+
+function submitVote(){
+
+    const name = document.getElementById("name").value.trim();
+    const number = parseInt(document.getElementById("colorNumber").value);
+
+    if(!name || !number || number<1 || number>50){
+        alert("Please enter valid name and colour number (1-50)");
+        return;
+    }
+
+    voterData.push({name:name, number:number});
+    votes[number]++;
+
+    updateTable();
+    updateLeader();
+
+    document.getElementById("name").value="";
+    document.getElementById("colorNumber").value="";
+}
+
+function updateTable(){
+    const table = document.getElementById("voterTable");
+    table.innerHTML="";
+    voterData.forEach(function(v){
+        table.innerHTML+="<tr><td>"+v.name+"</td><td>"+v.number+"</td></tr>";
+    });
+}
+
+function updateLeader(){
+    let max=0;
+    let leaderNumber=0;
+
+    for(let i=1;i<=50;i++){
+        if(votes[i]>max){
+            max=votes[i];
+            leaderNumber=i;
+        }
+    }
+
+    if(max>0){
+        document.getElementById("leader").innerText=
+            "🏆 Leading Colour: " + leaderNumber + " (" + max + " votes)";
+    }
+}
+
+</script>
+
+</body>
+</html>
